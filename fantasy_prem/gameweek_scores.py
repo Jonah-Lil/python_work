@@ -5,7 +5,7 @@ import os
 
 ca = certifi.where()
 print(ca)
-MONGO_URI = os.environ.get('MONGO_URI')
+MONGO_URI = os.getenv('MONGO_URI')
 print(MONGO_URI[0:10])
 
 client = MongoClient(
