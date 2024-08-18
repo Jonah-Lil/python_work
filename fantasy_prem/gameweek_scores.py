@@ -6,7 +6,6 @@ import os
 ca = certifi.where()
 MONGO_URI = os.environ.get('MONGO_URI')
 
-
 client = MongoClient(
     MONGO_URI,
     tlsCAFile=ca)
@@ -56,8 +55,6 @@ def update_scores():
         gameweek_scores = get_history_id(id)
         result = client['fpl_live']['weekly_scores'].insert_many(gameweek_scores)
 
-
-
-
-
-update_scores()
+if __name__ == "__main__":
+    update_managers()
+    update_scores()
