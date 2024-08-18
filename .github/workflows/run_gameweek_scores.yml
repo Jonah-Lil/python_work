@@ -3,7 +3,7 @@ name: Run Gameweek Scores
 on:
   schedule:
     - cron: '0 8 * * *'  # Runs at 8:00 AM UTC every day
-  workflow_dispatch:  # Add this line to enable manual triggers
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   run-python-script:
@@ -20,8 +20,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -r requirements.txt  # Use 'pip' instead of 'pip3'
+
+      - name: Debug Python version
+        run: |
+          python --version
+          pip --version
+
+      - name: Debug directory structure
+        run: |
+          ls -al fantasy_prem
 
       - name: Run gameweek_scores.py
         run: |
-          python /fantasy_prem/gameweek_scores.py
+          python fantasy_prem/gameweek_scores.py
