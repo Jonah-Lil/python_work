@@ -31,6 +31,8 @@ jobs:
         run: |
           ls -al fantasy_prem
 
-      - name: Run gameweek_scores.py
+      - name: Run script
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}  # Make the secret available as an environment variable
         run: |
           python fantasy_prem/gameweek_scores.py
