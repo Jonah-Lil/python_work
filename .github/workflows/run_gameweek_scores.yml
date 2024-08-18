@@ -15,12 +15,12 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12.4'  # Specify the Python version you need
+          python-version: '3.12'  # Adjust as needed
 
       - name: Install dependencies
         run: |
-          pip3 install -r requirements.txt
+          pip install -r requirements.txt  # Use 'pip' instead of 'pip3'
 
       - name: Run gameweek_scores.py
         run: |
-          python3 /fantasy_prem/gameweek_scores.py
+          python /fantasy_prem/gameweek_scores.py  # Adjust path if needed
