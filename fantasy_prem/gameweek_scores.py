@@ -25,6 +25,26 @@ def update_managers():
     result = client['fpl_live']['config'].delete_many({})
     result = client['fpl_live']['config'].insert_many(manager_dicts)
 
+def get_results():
+    url_results = "https://fantasy.premierleague.com/api/leagues-h2h-matches/league/147261/"
+    results = []
+    page = 1
+
+    while True:
+        url = f"{url_results}?page={page}"
+        response = requests.get(url)
+        data = response.json()
+
+        if 'results' in data:
+            results.extend(data['results'])
+        
+        if not data.get('has_next', False):
+            break
+
+        page += 1
+    
+    result = client['fpl_live']['matches'].delete_many({})
+    result = client['fpl_live']['matches'].insert_many(results)
 
 def get_history_id(team_id):
     url = f"https://fantasy.premierleague.com/api/entry/{team_id}/history/"
@@ -60,3 +80,4 @@ def update_scores():
 if __name__ == "__main__":
     update_managers()
     update_scores()
+    get_results()
