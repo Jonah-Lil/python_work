@@ -3,6 +3,8 @@ import certifi
 import requests
 import os
 
+from king_of_the_hill import get_koh
+
 ca = certifi.where()
 print(ca)
 MONGO_URI = os.getenv('MONGO_URI')
@@ -81,3 +83,4 @@ if __name__ == "__main__":
     update_managers()
     update_scores()
     get_results()
+    get_koh()
