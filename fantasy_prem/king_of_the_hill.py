@@ -60,14 +60,14 @@ def get_koh(initial_king = 1652909):
                 king_number = 1 if koh_match['entry_1_entry'] == king else 2
                 op_number = 2 if king_number == 1 else 1
                 op_entry = koh_match[f'entry_{op_number}_entry']
-                king_result = 'loss' if koh_match[f'entry_{king_number}_loss'] == 1 else 'win'
+                king_result = 'Loss' if koh_match[f'entry_{king_number}_loss'] == 1 else 'Win'
 
                 koh_results.append({
                     'gameweek': gameweek,
                     'king': king,
                     'opponent': op_entry,
                     'result': king_result,
-                    'next_king': king if king_result == 'loss' else op_entry
+                    'next_king': king if king_result == 'Loss' else op_entry
                 })
 
                 break
