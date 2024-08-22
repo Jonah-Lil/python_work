@@ -4,6 +4,8 @@ import requests
 import os
 
 from king_of_the_hill import get_koh
+from lms_gpt import get_lms
+from lives_tracking import update_lives
 
 ca = certifi.where()
 print(ca)
@@ -84,3 +86,5 @@ if __name__ == "__main__":
     update_scores()
     get_results()
     get_koh()
+    get_lms(MONGO_URI)
+    update_lives(MONGO_URI)
