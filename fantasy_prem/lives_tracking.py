@@ -61,16 +61,30 @@ def update_lives(MONGO_URI):
 
     # Prepare the data for insertion into the 'lives_tracker' collection
     lives_records = []
+
+    # Collect all IDs across all gameweeks
+    all_ids = set()
+    for gameweek, ids_lives in lives_data.items():
+        all_ids.update(ids_lives.keys())
+
+    # Add records for each ID for each gameweek
+    for record in last_man_standing_data:
+        gameweek = str(record['gameweek'])  # Convert gameweek to string
+        for id_ in all_ids:
+            if id_ not in lives_data[gameweek]:
+                # If ID did not record one of the three lowest scores, it still has full lives
+                lives_data[gameweek][id_] = 3
+
+    # Prepare the final records for insertion
     for gameweek, ids_lives in lives_data.items():
         for id_, lives in ids_lives.items():
-            if lives >= 0:  # Ensure lives are valid
-                lives_records.append({
-                    "gameweek": gameweek,
-                    "lowest_score": {
-                        "id": int(id_),  # Convert ID to integer
-                        "lives_remaining": lives
-                    }
-                })
+            lives_records.append({
+                "gameweek": gameweek,
+                "lowest_score": {
+                    "id": int(id_),  # Convert ID to integer
+                    "lives_remaining": lives
+                }
+            })
 
     # Clear the 'lives_tracker' collection before inserting new data
     lives_tracker_collection.delete_many({})
