@@ -27,11 +27,16 @@ def update_lives(MONGO_URI):
     # Fetch all records from the 'last_man_standing' collection
     last_man_standing_data = list(last_man_standing_collection.find({}))
 
-    # Fetch all records from the 'config' collection to map IDs to player names
-    config_data = {str(record['id']): record['player_name'] for record in config_collection.find({})}
+    # Fetch all records from the 'config' collection to map entry IDs to player names
+    config_data = {str(record['entry']): record['player_name'] for record in config_collection.find({})}
 
-    # Initialize the nested dictionary
-    lives_data = defaultdict(lambda: defaultdict(lambda: 3))  # Starts with 3 lives for each ID
+    # Initialize the dictionary to track lives for each player
+    # Start with 3 lives for all IDs
+    lives_data = defaultdict(lambda: defaultdict(lambda: 3))
+    previous_gameweek_lives = defaultdict(lambda: defaultdict(lambda: 3))
+
+    # Sort records by gameweek to process in order
+    last_man_standing_data.sort(key=lambda x: x['gameweek'])
 
     # Process each gameweek record
     for record in last_man_standing_data:
@@ -39,6 +44,16 @@ def update_lives(MONGO_URI):
         lowest_score_id = record['id_lowest_score']
         second_lowest_score_id = record['id_second_lowest_score']
         third_lowest_score_id = record['id_third_lowest_score']
+
+        # Get lives from the previous gameweek
+        if gameweek != '1':  # Skip for the first gameweek
+            previous_lives = lives_data[str(int(gameweek) - 1)]
+        else:
+            previous_lives = {id_: 3 for id_ in config_data.keys()}
+
+        # Update lives based on the previous gameweek
+        for id_ in config_data.keys():
+            lives_data[gameweek][id_] = previous_lives.get(id_, 3)
 
         # List of IDs that lose a life in this gameweek
         ids_losing_life = []
@@ -50,41 +65,38 @@ def update_lives(MONGO_URI):
         if isinstance(third_lowest_score_id, int):
             ids_losing_life.append(str(third_lowest_score_id))
 
+        # Decrement lives for IDs that appear in the three lowest scores
         for id_ in ids_losing_life:
-            if id_:  # Ensure id_ is not empty or None
-                # Decrement lives if this ID appears in the gameweek
+            if id_:
                 lives_data[gameweek][id_] -= 1
-
-                # Ensure lives do not go below 0
                 if lives_data[gameweek][id_] < 0:
                     lives_data[gameweek][id_] = 0
 
     # Prepare the data for insertion into the 'lives_tracker' collection
     lives_records = []
 
-    # Collect all IDs across all gameweeks
-    all_ids = set()
-    for gameweek, ids_lives in lives_data.items():
-        all_ids.update(ids_lives.keys())
+    # Collect all IDs from the config collection
+    all_ids = set(config_data.keys())
 
-    # Add records for each ID for each gameweek
-    for record in last_man_standing_data:
-        gameweek = str(record['gameweek'])  # Convert gameweek to string
-        for id_ in all_ids:
-            if id_ not in lives_data[gameweek]:
-                # If ID did not record one of the three lowest scores, it still has full lives
-                lives_data[gameweek][id_] = 3
-
-    # Prepare the final records for insertion
+    # Process each gameweek to create records
     for gameweek, ids_lives in lives_data.items():
+        gameweek_record = {
+            "gameweek": gameweek,
+            "lowest_score": []
+        }
+        
+        # Add IDs with updated lives for this gameweek
         for id_, lives in ids_lives.items():
-            lives_records.append({
-                "gameweek": gameweek,
-                "lowest_score": {
-                    "id": int(id_),  # Convert ID to integer
-                    "lives_remaining": lives
-                }
+            gameweek_record["lowest_score"].append({
+                "id": int(id_),  # Convert ID to integer
+                "lives_remaining": lives
             })
+
+        # Ensure the list is sorted by ID if needed (optional)
+        gameweek_record["lowest_score"].sort(key=lambda x: x['id'])
+
+        # Append the record for this gameweek
+        lives_records.append(gameweek_record)
 
     # Clear the 'lives_tracker' collection before inserting new data
     lives_tracker_collection.delete_many({})
