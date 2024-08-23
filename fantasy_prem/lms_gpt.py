@@ -102,11 +102,11 @@ def get_lms(MONGO_URI):
             "gameweek": gameweek,
             "round_type": round_type,
             "id_lowest_score": lowest_score_id,
-            "id_second_lowest_score": second_lowest_score_id if round_type in ['Double', 'Triple'] else 'none',
-            "id_third_lowest_score": third_lowest_score_id if round_type == 'Triple' else 'none',
+            "id_second_lowest_score": second_lowest_score_id if round_type in ['Double', 'Triple'] else None,
+            "id_third_lowest_score": third_lowest_score_id if round_type == 'Triple' else None,
             "lowest_score": lowest_score,
-            "second_lowest_score": second_lowest_score if round_type in ['Double', 'Triple'] else 'none',
-            "third_lowest_score": third_lowest_score if round_type == 'Triple' else 'none'
+            "second_lowest_score": second_lowest_score if round_type in ['Double', 'Triple'] else None,
+            "third_lowest_score": third_lowest_score if round_type == 'Triple' else None
         })
 
     # Insert the results into the 'last_man_standing' collection
