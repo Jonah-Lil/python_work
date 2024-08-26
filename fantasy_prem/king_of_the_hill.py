@@ -67,7 +67,7 @@ def get_koh(initial_king = 1652909):
                     'king': king,
                     'opponent': op_entry,
                     'result': king_result,
-                    'next_king': king if king_result == 'Loss' else op_entry
+                    'next_king': king if king_result == 'Win' else op_entry
                 })
 
                 break
