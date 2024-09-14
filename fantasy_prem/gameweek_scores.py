@@ -87,4 +87,3 @@ if __name__ == "__main__":
     get_results()
     get_koh()
     get_lms(MONGO_URI)
-    update_lives(MONGO_URI)
