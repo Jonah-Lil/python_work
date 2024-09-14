@@ -4,7 +4,7 @@ import requests
 import os
 
 from king_of_the_hill import get_koh
-from lms_gpt import get_lms
+from lms_v2 import get_lms
 from lives_tracking import update_lives
 
 ca = certifi.where()
